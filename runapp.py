@@ -112,7 +112,7 @@ def load_keras_model():
 model = load_keras_model()
 
 # ---------------- HEADER ----------------
-st.markdown('<div class="title fade-in">🔍 Image Authenticity Checker</div>', unsafe_allow_html=True)
+st.markdown('<div class="title fade-in">🔍 Image Forgery Detection</div>', unsafe_allow_html=True)
 st.markdown('<div class="subtitle fade-in">Detect Real vs Fake images</div>', unsafe_allow_html=True)
 
 # ---------------- UPLOAD ----------------
