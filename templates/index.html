@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Image Forgery Detection</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+/* RESET */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* BODY */
+body {
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    overflow-x: hidden;
+}
+
+/* FULL BACKGROUND */
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+    z-index: -2;
+}
+
+/* ANIMATED GLOW */
+.background::after {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0,255,255,0.12), transparent);
+    animation: move 12s linear infinite;
+}
+
+@keyframes move {
+    0% { transform: translate(-30%, -30%); }
+    100% { transform: translate(30%, 30%); }
+}
+
+/* NAVBAR */
+.navbar {
+    width: 100%;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.toggle button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 20px;
+    background: cyan;
+    cursor: pointer;
+}
+
+/* MAIN SECTION */
+.main {
+    min-height: calc(100vh - 80px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* CARD */
+.card {
+    width: 100%;
+    max-width: 450px;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(25px);
+    box-shadow: 0 0 40px rgba(0,255,255,0.3);
+    text-align: center;
+    animation: fadeIn 1s ease;
+}
+
+/* TITLE */
+.card h1 {
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    font-size: 14px;
+    opacity: 0.7;
+    margin-bottom: 25px;
+}
+
+/* DROP AREA */
+.drop-area {
+    border: 2px dashed cyan;
+    padding: 30px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.drop-area:hover {
+    background: rgba(0,255,255,0.1);
+    transform: scale(1.03);
+}
+
+/* BUTTON */
+button.analyze {
+    margin-top: 20px;
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(45deg, #00f2fe, #4facfe);
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button.analyze:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px cyan;
+}
+
+/* IMAGE */
+img {
+    margin-top: 20px;
+    width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    object-fit: contain;
+    display: none;
+}
+
+/* RESULT */
+#result {
+    margin-top: 15px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+/* LOADER */
+.loader {
+    margin-top: 15px;
+    height: 4px;
+    width: 100%;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+    display: none;
+}
+
+.loader::before {
+    content: "";
+    display: block;
+    height: 100%;
+    width: 40%;
+    background: cyan;
+    animation: loading 1.2s infinite;
+}
+
+@keyframes loading {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(250%); }
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* LIGHT MODE */
+.light {
+    color: black;
+}
+
+.light .background {
+    background: linear-gradient(120deg, #e3f2fd, #ffffff);
+}
+
+.light .card {
+    background: rgba(0,0,0,0.05);
+    color: black;
+}
+
+/* RESPONSIVE */
+@media (max-width: 500px) {
+    .card {
+        padding: 25px;
+    }
+
+    .navbar {
+        padding: 15px 20px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="background"></div>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="logo">🔍Image Forgery Detection</div>
+    <div class="toggle">
+        <button onclick="toggleMode()">🌗</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+<div class="card">
+
+<h1>Analyze Image</h1>
+<div class="subtitle">Detect manipulated or forged images </div>
+
+<div class="drop-area" id="drop">
+    📂 Drag & Drop or Click to Upload
+    <input type="file" id="file" hidden>
+</div>
+
+<button class="analyze" onclick="predict()">Analyze Image</button>
+
+<div class="loader" id="loader"></div>
+
+<img id="preview">
+<div id="result"></div>
+
+</div>
+</div>
+
+<script>
+
+/* DARK MODE */
+function toggleMode() {
+    document.body.classList.toggle("light");
+}
+
+/* FILE INPUT */
+let drop = document.getElementById("drop");
+let fileInput = document.getElementById("file");
+
+drop.onclick = () => fileInput.click();
+
+drop.addEventListener("dragover", e => {
+    e.preventDefault();
+    drop.style.background = "rgba(0,255,255,0.2)";
+});
+
+drop.addEventListener("dragleave", () => {
+    drop.style.background = "transparent";
+});
+
+drop.addEventListener("drop", e => {
+    e.preventDefault();
+    fileInput.files = e.dataTransfer.files;
+    previewFile();
+});
+
+fileInput.addEventListener("change", previewFile);
+
+/* PREVIEW */
+function previewFile() {
+    let file = fileInput.files[0];
+    let img = document.getElementById("preview");
+
+    img.src = URL.createObjectURL(file);
+    img.style.display = "block";
+}
+
+/* PREDICT */
+function predict() {
+
+    let file = fileInput.files[0];
+
+    if (!file) {
+        alert("Please upload an image");
+        return;
+    }
+
+    let loader = document.getElementById("loader");
+    let result = document.getElementById("result");
+
+    loader.style.display = "block";
+    result.innerText = "Analyzing image...";
+
+    let formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/predict", {
+        method: "POST",
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        loader.style.display = "none";
+        result.innerText = "Result: " + data.result;
+    })
+    .catch(() => {
+        loader.style.display = "none";
+        result.innerText = "Server error!";
+    });
+}
+
+</script>
+
+</body>
+</html>

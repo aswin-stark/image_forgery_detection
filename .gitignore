@@ -1,0 +1,91 @@
+# ======================
+# Python
+# ======================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.Python
+
+# ======================
+# Virtual Environments
+# ======================
+venv/
+env/
+ENV/
+.venv/
+.env/
+
+# ======================
+# Environment Variables
+# ======================
+.env
+.env.local
+.env.*.local
+
+# ======================
+# Model Files (large)
+# ======================
+*.h5
+*.pkl
+*.ckpt
+*.pb
+saved_model/
+
+# ======================
+# Flask
+# ======================
+instance/
+.webassets-cache
+flask_session/
+
+# ======================
+# TensorFlow / Keras Logs
+# ======================
+logs/
+runs/
+*.tfevents.*
+__pycache__/
+
+# ======================
+# Jupyter Notebooks
+# ======================
+.ipynb_checkpoints/
+*.ipynb
+
+# ======================
+# OS Files
+# ======================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ======================
+# IDEs & Editors
+# ======================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ======================
+# Uploads (user data)
+# ======================
+uploads/
+static/uploads/
+
+# ======================
+# Distribution / Build
+# ======================
+dist/
+build/
+*.egg-info/
+.eggs/
+
+# ======================
+# Testing
+# ======================
+.pytest_cache/
+.coverage
+htmlcov/
