@@ -1,5 +1,5 @@
 # 🖼️ Fake vs Real Image Detector
-
+Live On : https://image-forgery-dt.streamlit.app
 A Flask web application that uses a deep learning model to classify images as **Real** or **Fake**.
 
 ![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
