@@ -462,7 +462,7 @@ if uploaded_file is not None:
     bar_width = round(conf_pct * 100)
     risk      = "High" if conf_pct > 0.85 else "Medium" if conf_pct > 0.65 else "Low"
 
-    st.markdown(f"""
+    st.markdown("""
     <div class="v-result {css_cls}">
         <div class="v-result-icon-wrap">{icon}</div>
         <div class="v-result-body">
